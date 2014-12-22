@@ -46,6 +46,5 @@ document.addEventListener("DOMContentLoaded", function() {
       //TODO: Error handling
     }
     xmlhttp.send();
-    console.log('oli');
   });
 });
