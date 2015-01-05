@@ -53,6 +53,7 @@ function globie_vimeo_id_meta_box_callback( $post ) {
   //_e( 'Vimeo ID goes here', 'globie_vimeo_id' );
   echo '</label> ';
   echo '<input type="text" id="globie-vimeo-id-field" name="globie-vimeo-id-field" value="' . esc_attr( $vimeo_id_value ) . '" size="25" />';
+  echo '<input type="hidden" id="globie-vimeo-img-field" name="globie-vimeo-img-field" value="" />';
   echo ' <input type="submit" id="suck-vimeo-data" value="Suck it!" class="button">';
 }
 
@@ -80,16 +81,54 @@ function globie_save_vimeo_id( $post_id ) {
   
   // OK, it's safe for us to save the data now. 
   
-  // Make sure that it is set.
+  // Make sure that vimeo ID is set.
   if ( ! isset( $_POST['globie-vimeo-id-field'] ) ) {
     return;
   }
 
-  // Sanitize user input
+  // Sanitize vimeo ID input
   $vimeo_id = sanitize_text_field( $_POST['globie-vimeo-id-field'] );
 
-  // Update the meta field in the database.
+  // Update the vimeo ID field in the database.
   update_post_meta( $post_id, '_vimeo_id_value', $vimeo_id );
+  
+  // Make sure that thumb url is set.
+  if ( ! isset( $_POST['globie-vimeo-img-field'] ) ) {
+    return;
+  }
+
+  // Sanitize user input
+  $vimeo_img = sanitize_text_field( $_POST['globie-vimeo-img-field'] );
+  $upload_dir = wp_upload_dir();
+
+  //Get the remote image and save to uploads directory
+  $img_name = time().'_'.basename( $vimeo_img );
+  $img = wp_remote_get( $vimeo_img );
+  if ( is_wp_error( $img ) ) {
+    $error_message = $img->get_error_message();
+    add_action( 'admin_notices', array( $this, 'wprthumb_admin_notice' ) );
+  } else {
+    $img = wp_remote_retrieve_body( $img );
+    $fp = fopen( $upload_dir['path'].'/'.$img_name , 'w' );
+    fwrite( $fp, $img );
+    fclose( $fp );
+    $wp_filetype = wp_check_filetype( $img_name , null );
+    $attachment = array(
+      'post_mime_type' => $wp_filetype['type'],
+      'post_title' => preg_replace( '/\.[^.]+$/', '', $img_name ),
+      'post_content' => '',
+      'post_status' => 'inherit'
+    );
+    //require for wp_generate_attachment_metadata which generates image related meta-data also creates thumbs
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+    $attach_id = wp_insert_attachment( $attachment, $upload_dir['path'].'/'.$img_name, $post_id );
+    //Generate post thumbnail of different sizes.
+    $attach_data = wp_generate_attachment_metadata( $attach_id , $upload_dir['path'].'/'.$img_name );
+    wp_update_attachment_metadata( $attach_id,  $attach_data );
+    //Set as featured image.
+    delete_post_meta( $post_id, '_thumbnail_id' );
+    add_post_meta( $post_id , '_thumbnail_id' , $attach_id, true );
+  }
   
 }
 add_action( 'save_post', 'globie_save_vimeo_id' );

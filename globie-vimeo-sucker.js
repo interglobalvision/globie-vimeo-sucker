@@ -40,7 +40,17 @@ document.addEventListener("DOMContentLoaded", function() {
         });
         document.getElementById('new-tag-post_tag').value = tagsList;
 
-        //TODO: set featured image
+        // Set featured image
+        //    Set Thumbnail
+        var featImg = document.createElement('img');
+        featImg.setAttribute('src', vimeoData.pictures.sizes[2].link);
+        featImg.setAttribute('width', 266);
+        var inside = document.getElementById('postimagediv').getElementsByClassName('inside')[0];
+        inside.appendChild(featImg);
+        
+        //    Set url in hidden field
+        document.getElementById('globie-vimeo-img-field').value = vimeoData.pictures.sizes[4].link;
+
       }
       
       //TODO: Error handling
