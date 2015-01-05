@@ -55,6 +55,7 @@ function globie_vimeo_id_meta_box_callback( $post ) {
   echo '<input type="text" id="globie-vimeo-id-field" name="globie-vimeo-id-field" value="' . esc_attr( $vimeo_id_value ) . '" size="25" />';
   echo '<input type="hidden" id="globie-vimeo-img-field" name="globie-vimeo-img-field" value="" />';
   echo ' <input type="submit" id="suck-vimeo-data" value="Suck it!" class="button">';
+  echo ' <div id="globie-spinner" style="background: url(\'/wp-admin/images/wpspin_light.gif\') no-repeat; background-size: 16px 16px; display: none; opacity: .7; filter: alpha(opacity=70); width: 16px; height: 16px; margin: 0 10px;"></div>';
 }
 
 function globie_save_vimeo_id( $post_id ) {

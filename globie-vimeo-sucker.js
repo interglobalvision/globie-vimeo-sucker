@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", function() {
   var suckDataButton = document.getElementById('suck-vimeo-data');
   suckDataButton.addEventListener("click", function(e) {
     e.preventDefault();
+
+    // Turn on spinner
+    document.getElementById('globie-spinner').style.display = "inline-block";
     vimeoId = document.getElementById('globie-vimeo-id-field');
     if( vimeoId.value == '' ) {
       alert('Vimeo ID needed');
@@ -42,11 +45,14 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('new-tag-post_tag').value = tagsList;
 
         // Set featured image
+        var inside = document.getElementById('postimagediv').getElementsByClassName('inside')[0];
+        inside.innerHTML = '';
+
         //    Set Thumbnail
         var featImg = document.createElement('img');
+        featImg.setAttribute('id', 'globie-vimeo-img');
         featImg.setAttribute('src', vimeoData.pictures.sizes[2].link);
         featImg.setAttribute('width', 266);
-        var inside = document.getElementById('postimagediv').getElementsByClassName('inside')[0];
         inside.appendChild(featImg);
         
         //    Set url in hidden field
@@ -54,6 +60,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
       }
       
+    // Turn off spinner
+    document.getElementById('globie-spinner').style.display = "none";
       //TODO: Error handling
     }
     xmlhttp.send();
