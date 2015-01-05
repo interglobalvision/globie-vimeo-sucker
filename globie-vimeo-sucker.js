@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
         var vimeoData = JSON.parse(xmlhttp.responseText);
 
         // Set title
+        document.getElementById('title').focus();
         document.getElementById('title').value = vimeoData.name;
 
         // Set content
