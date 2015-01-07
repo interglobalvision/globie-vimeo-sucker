@@ -1,15 +1,15 @@
 <?php
 /**
  * Plugin Name: Globie Vimeo Sucker
- * Plugin URI: 
+ * Plugin URI:
  * Description: Pull data directly from viemo and insert it on your post.
  * Version: 1.0.0
  * Author: Interglobal Vision
  * Author URI: http://interglobal.vision
- * License: GPL2 
+ * License: GPL2
 */
 
-/** Load JS scripts 
+/** Load JS scripts
  *  Only on post.php and post-new.php
  */
 function globie_vimeo_sucker_enqueue($hook){
@@ -28,7 +28,7 @@ function globie_add_vimeo_field() {
     'globie-video-id-meta-box',
     'Vimeo ID',
     'globie_vimeo_id_meta_box_callback',
-    'post'
+    'video'
   );
 }
 add_action( 'add_meta_boxes', 'globie_add_vimeo_field');
@@ -48,7 +48,7 @@ function globie_vimeo_id_meta_box_callback( $post ) {
    * from the database and use the value for the form.
    */
   $vimeo_id_value = get_post_meta( $post->ID, '_vimeo_id_value', true );
-  
+
   echo '<label for="globie-vimeo-id-field">';
   //_e( 'Vimeo ID goes here', 'globie_vimeo_id' );
   echo '</label> ';
@@ -59,7 +59,7 @@ function globie_vimeo_id_meta_box_callback( $post ) {
 }
 
 function globie_save_vimeo_id( $post_id ) {
-  
+
   // Check nonce
   if ( ! isset( $_POST['globie_vimeo_sucker_nonce'] ) ) {
     return;
@@ -79,9 +79,9 @@ function globie_save_vimeo_id( $post_id ) {
   if ( ! current_user_can( 'edit_post', $post_id ) ) {
     return;
   }
-  
-  // OK, it's safe for us to save the data now. 
-  
+
+  // OK, it's safe for us to save the data now.
+
   // Make sure that vimeo ID is set.
   if ( ! isset( $_POST['globie-vimeo-id-field'] ) ) {
     return;
@@ -92,7 +92,7 @@ function globie_save_vimeo_id( $post_id ) {
 
   // Update the vimeo ID field in the database.
   update_post_meta( $post_id, '_vimeo_id_value', $vimeo_id );
-  
+
   // Make sure that thumb url is set.
   if ( ! isset( $_POST['globie-vimeo-img-field'] ) ) {
     return;
@@ -130,6 +130,6 @@ function globie_save_vimeo_id( $post_id ) {
     delete_post_meta( $post_id, '_thumbnail_id' );
     add_post_meta( $post_id , '_thumbnail_id' , $attach_id, true );
   }
-  
+
 }
 add_action( 'save_post', 'globie_save_vimeo_id' );
