@@ -10,10 +10,10 @@ document.addEventListener("DOMContentLoaded", function() {
       alert('Vimeo ID needed');
       return;
     }
-    
+
     // Get access token
     // TODO: Get token from hidden field
-    
+
     // Get video data
     var xmlhttp;
     if (window.XMLHttpRequest) {
@@ -25,8 +25,11 @@ document.addEventListener("DOMContentLoaded", function() {
     xmlhttp.setRequestHeader("Authorization", "bearer a0c52130c00d1382bb992ebc59abc9cf");
     xmlhttp.onreadystatechange = function() {
       if( xmlhttp.readyState == 4 && xmlhttp.status == 200 ) {
-        console.log(xmlhttp.responseText);
+//         console.log(xmlhttp.responseText);
         var vimeoData = JSON.parse(xmlhttp.responseText);
+
+        console.log(vimeoData.width);
+        console.log(vimeoData.height);
 
         // Set title
         document.getElementById('title').focus();
@@ -36,13 +39,18 @@ document.addEventListener("DOMContentLoaded", function() {
         window.switchEditors.switchto({id: "content-html"});
         document.getElementById('content').value = vimeoData.description;
         window.switchEditors.switchto({id: "content-tmce"});
-        
+
         // Set tags
         var tagsList = '';
         vimeoData.tags.forEach( function(tag, index, tags) {
           tagsList += tag.name + ", ";
         });
         document.getElementById('new-tag-post_tag').value = tagsList;
+
+        // Set video values
+        document.getElementById('globie-vimeo-width-field').value = vimeoData.width;
+        document.getElementById('globie-vimeo-height-field').value = vimeoData.height;
+        document.getElementById('globie-vimeo-ratio-field').value = (vimeoData.height/vimeoData.width);
 
         // Set featured image
         var inside = document.getElementById('postimagediv').getElementsByClassName('inside')[0];
@@ -54,12 +62,12 @@ document.addEventListener("DOMContentLoaded", function() {
         featImg.setAttribute('src', vimeoData.pictures.sizes[2].link);
         featImg.setAttribute('width', 266);
         inside.appendChild(featImg);
-        
+
         //    Set url in hidden field
         document.getElementById('globie-vimeo-img-field').value = vimeoData.pictures.sizes[4].link;
 
       }
-      
+
     // Turn off spinner
     document.getElementById('globie-spinner').style.display = "none";
       //TODO: Error handling

@@ -48,12 +48,20 @@ function globie_vimeo_id_meta_box_callback( $post ) {
    * from the database and use the value for the form.
    */
   $vimeo_id_value = get_post_meta( $post->ID, '_vimeo_id_value', true );
+  $vimeo_width_value = get_post_meta( $post->ID, '_vimeo_width_value', true );
+  $vimeo_height_value = get_post_meta( $post->ID, '_vimeo_height_value', true );
+  $vimeo_ratio_value = get_post_meta( $post->ID, '_vimeo_ratio_value', true );
 
   echo '<label for="globie-vimeo-id-field">';
   //_e( 'Vimeo ID goes here', 'globie_vimeo_id' );
   echo '</label> ';
   echo '<input type="text" id="globie-vimeo-id-field" name="globie-vimeo-id-field" value="' . esc_attr( $vimeo_id_value ) . '" size="25" />';
   echo '<input type="hidden" id="globie-vimeo-img-field" name="globie-vimeo-img-field" value="" />';
+
+  echo '<input type="hidden" id="globie-vimeo-width-field" name="globie-vimeo-width-field" value="' . esc_attr( $vimeo_width_value ) . '" />';
+  echo '<input type="hidden" id="globie-vimeo-height-field" name="globie-vimeo-height-field" value="' . esc_attr( $vimeo_height_value ) . '" />';
+  echo '<input type="hidden" id="globie-vimeo-ratio-field" name="globie-vimeo-ratio-field" value="' . esc_attr( $vimeo_ratio_value ) . '" />';
+
   echo ' <input type="submit" id="suck-vimeo-data" value="Suck it!" class="button">';
   echo ' <div id="globie-spinner" style="background: url(\'/wp-admin/images/wpspin_light.gif\') no-repeat; background-size: 16px 16px; display: none; opacity: .7; filter: alpha(opacity=70); width: 16px; height: 16px; margin: 0 10px;"></div>';
 }
@@ -92,6 +100,17 @@ function globie_save_vimeo_id( $post_id ) {
 
   // Update the vimeo ID field in the database.
   update_post_meta( $post_id, '_vimeo_id_value', $vimeo_id );
+
+  // Sanitize video values
+  $vimeo_width = sanitize_text_field( $_POST['globie-vimeo-width-field'] );
+  $vimeo_height = sanitize_text_field( $_POST['globie-vimeo-height-field'] );
+  $vimeo_ratio = sanitize_text_field( $_POST['globie-vimeo-ratio-field'] );
+
+  // Update meta values
+  update_post_meta( $post_id, '_vimeo_width_value', $vimeo_width );
+  update_post_meta( $post_id, '_vimeo_height_value', $vimeo_height );
+  update_post_meta( $post_id, '_vimeo_ratio_value', $vimeo_ratio );
+
 
   // Make sure that thumb url is set.
   if ( ! isset( $_POST['globie-vimeo-img-field'] ) ) {
