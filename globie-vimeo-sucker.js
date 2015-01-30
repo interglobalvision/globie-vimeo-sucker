@@ -41,9 +41,13 @@ document.addEventListener("DOMContentLoaded", function() {
         window.switchEditors.switchto({id: "content-tmce"});
 
         // Set tags
-        var tagsList = '';
+        var tagsList = '', 
+          whitelist = globieVimeoSuckerOptions['globie_vimeo_sucker_input_whitelist'].toLowerCase();
         vimeoData.tags.forEach( function(tag, index, tags) {
-          tagsList += tag.name + ", ";
+          // Check if tag is in the whitelist
+          // If the whitelist is empty all pass
+          if( !whitelist || whitelist.indexOf(tag.tag.toLowerCase() ) != -1)
+            tagsList += tag.name + ", ";
         });
         document.getElementById('new-tag-post_tag').value = tagsList;
 
