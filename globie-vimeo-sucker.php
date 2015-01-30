@@ -14,21 +14,11 @@
  * After activation actions
  */
 function globie_vimeo_sucker_activation() {
-  global $wpdb;
-  
   if( !get_option( 'globie_vimeo_sucker_settings' ) ) {
-    update_option( 'globie_vimeo_sucker_settings', '' );
-    $wpdb->update(
-      'wp_options',
-      array(
-        'option_value' => 'a:1:{s:43:"globie_vimeo_sucker_checkbox_post_type_post";s:1:"1";}'
-      ),
-      array(
-        'option_name' => 'globie_vimeo_sucker_settings' 
-      )
-    );
+    update_option( 'globie_vimeo_sucker_settings', array(
+      'globie_vimeo_sucker_checkbox_post_type_post' => true
+    ) );
   }
-  //delete_option('globie_vimeo_sucker_settings');
 }
 register_activation_hook( __FILE__, 'globie_vimeo_sucker_activation' );
 
