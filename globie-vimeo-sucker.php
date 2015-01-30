@@ -12,10 +12,10 @@
 /** Load JS scripts
  *  Only on post.php and post-new.php
  */
-function globie_vimeo_sucker_enqueue($hook){
-  if('post.php' != $hook && 'post-new.php' != $hook)
+function globie_vimeo_sucker_enqueue( $hook ){
+  if( 'post.php' != $hook && 'post-new.php' != $hook )
     return;
-  wp_register_script( 'globie-vimeo-sucker-script', plugins_url('/globie-vimeo-sucker.js', __FILE__), array('jquery'));
+  wp_register_script( 'globie-vimeo-sucker-script', plugins_url( '/globie-vimeo-sucker.js', __FILE__ ), array( 'jquery' ) );
   wp_enqueue_script( 'globie-vimeo-sucker-script' );
 }
 add_action('admin_enqueue_scripts', 'globie_vimeo_sucker_enqueue');
@@ -33,9 +33,9 @@ function globie_add_vimeo_field() {
     )
   );
 
-  foreach($post_types as $post_type) {
+  foreach( $post_types as $post_type ) {
     $field_name = 'globie_vimeo_sucker_checkbox_post_type_' . $post_type;
-    if(array_key_exists($field_name, $options ) ) {
+    if(array_key_exists( $field_name, $options ) ) {
       add_meta_box(
         'globie-video-id-meta-box',
         'Vimeo ID',
@@ -123,8 +123,7 @@ function globie_save_vimeo_id( $post_id ) {
   // Update meta values
   update_post_meta( $post_id, '_vimeo_width_value', $vimeo_width );
   update_post_meta( $post_id, '_vimeo_height_value', $vimeo_height );
-  update_post_meta( $post_id, '_vimeo_ratio_value', $vimeo_ratio );
-
+  update_post_meta( $post_id, '_vimeo_ratio_value', $vimeo_ratio ); 
 
   // Make sure that thumb url is set.
   if ( ! isset( $_POST['globie-vimeo-img-field'] ) ) {
@@ -219,10 +218,11 @@ function globie_vimeo_sucker_post_types_fields_render() {
   echo "<fieldset>";
   foreach( $post_types as $post_type ) {
     $field_name = 'globie_vimeo_sucker_checkbox_post_type_' . $post_type;
+    $checked = '';
 
     // Check if field is checked
     if( !empty( $options ) && array_key_exists( $field_name, $options ) )
-      $checked = $options[$field_name] ? 'checked' : '';
+      $checked = 'checked';
 
     echo '<label for="' .  $field_name . '"><input type="checkbox" name="globie_vimeo_sucker_settings[' .  $field_name . ']" id="' .  $field_name . '" value="1" ' . $checked . '> ' .  ucfirst($post_type) . '</label><br />';
   }
