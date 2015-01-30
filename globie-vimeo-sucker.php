@@ -221,6 +221,22 @@ function globie_vimeo_sucker_settings_init() {
     'globie_vimeo_sucker_globie_vimeo_sucker_post_types_section' 
   );
 
+  // Add whitelist section
+  add_settings_section(
+    'globie_vimeo_sucker_globie_vimeo_sucker_whitelist_section', 
+    __( 'Tags whitelist', 'wordpress' ), 
+    'globie_vimeo_sucker_settings_whitelist_section_callback',
+    'globie_vimeo_sucker_options_page'
+  );
+
+  // Whitelist field
+  add_settings_field( 
+    'globie_vimeo_sucker_whitelist_fields', 
+    __( 'Tags', 'wordpress' ), 
+    'globie_vimeo_sucker_whitelist_field_render', 
+    'globie_vimeo_sucker_options_page', 
+    'globie_vimeo_sucker_globie_vimeo_sucker_whitelist_section' 
+  );
 }
 
 
@@ -253,6 +269,26 @@ function globie_vimeo_sucker_post_types_fields_render() {
 
 function globie_vimeo_sucker_settings_section_callback() { 
   echo __( 'Select the post types where you want to enable the Viemo ID field', 'wordpress' );
+}
+
+function globie_vimeo_sucker_whitelist_field_render() { 
+
+  // Get options saved
+  $options = get_option( 'globie_vimeo_sucker_settings' );
+
+  if(array_key_exists('globie_vimeo_sucker_input_whitelist', $options ) )
+    $whitelist = $options['globie_vimeo_sucker_input_whitelist'];
+  else
+    $whitelist = '';
+
+  // Render fields
+  echo "<fieldset>";
+  echo '<label for="globie_vimeo_sucker_input_whitelist"><input type="text" name="globie_vimeo_sucker_settings[globie_vimeo_sucker_input_whitelist]" id="globie_vimeo_sucker_input_whitelist" value="' . $whitelist  . '"></label><br />';
+  echo "</fieldset>";
+}
+
+function globie_vimeo_sucker_settings_whitelist_section_callback() { 
+  echo __( 'Comma separeted list of whitelisted tags', 'wordpress' );
 }
 
 function globie_vimeo_sucker_options_page() { 
