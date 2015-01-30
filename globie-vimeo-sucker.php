@@ -24,12 +24,26 @@ add_action('admin_enqueue_scripts', 'globie_vimeo_sucker_enqueue');
  * Adds a box to the main column on the Post (FOR NOW) edit screen.
  */
 function globie_add_vimeo_field() {
-  add_meta_box(
-    'globie-video-id-meta-box',
-    'Vimeo ID',
-    'globie_vimeo_id_meta_box_callback',
-    'video'
+  $options = get_option( 'globie_vimeo_sucker_settings' );
+
+  // Get post types
+  $post_types= get_post_types(
+    array(
+      'public' => true
+    )
   );
+
+  foreach($post_types as $post_type) {
+    $field_name = 'globie_vimeo_sucker_checkbox_post_type_' . $post_type;
+    if(array_key_exists($field_name, $options ) ) {
+      add_meta_box(
+        'globie-video-id-meta-box',
+        'Vimeo ID',
+        'globie_vimeo_id_meta_box_callback',
+        $post_type
+      );
+    }
+  }
 }
 add_action( 'add_meta_boxes', 'globie_add_vimeo_field');
 
@@ -152,3 +166,88 @@ function globie_save_vimeo_id( $post_id ) {
 
 }
 add_action( 'save_post', 'globie_save_vimeo_id' );
+add_action( 'admin_menu', 'globie_vimeo_sucker_add_admin_menu' );
+add_action( 'admin_init', 'globie_vimeo_sucker_settings_init' );
+
+
+function globie_vimeo_sucker_add_admin_menu() { 
+  add_options_page(
+    'Globie Vimeo Sucker Options',
+    'Globie Vimeo Sucker',
+    'manage_options',
+    'globie_vimeo_sucker',
+    'globie_vimeo_sucker_options_page'
+  );
+}
+
+// Register settings, sections and fields
+function globie_vimeo_sucker_settings_init() { 
+  register_setting( 'globie_vimeo_sucker_options_page', 'globie_vimeo_sucker_settings' );
+
+  // Add post type section
+  add_settings_section(
+    'globie_vimeo_sucker_globie_vimeo_sucker_post_types_section', 
+    __( 'Enable/Disbale on post types', 'wordpress' ), 
+    'globie_vimeo_sucker_settings_section_callback', 
+    'globie_vimeo_sucker_options_page'
+  );
+
+  // Post Types fields
+  add_settings_field( 
+    'globie_vimeo_sucker_post_types_fields', 
+    __( 'Post types', 'wordpress' ), 
+    'globie_vimeo_sucker_post_types_fields_render', 
+    'globie_vimeo_sucker_options_page', 
+    'globie_vimeo_sucker_globie_vimeo_sucker_post_types_section' 
+  );
+
+}
+
+
+function globie_vimeo_sucker_post_types_fields_render() { 
+  // Get options saved
+  $options = get_option( 'globie_vimeo_sucker_settings' );
+
+  // Get post types
+  $post_types= get_post_types(
+    array(
+      'public' => true
+    )
+  );
+
+  // Render fields
+  echo "<fieldset>";
+  foreach( $post_types as $post_type ) {
+    $field_name = 'globie_vimeo_sucker_checkbox_post_type_' . $post_type;
+
+    // Check if field is checked
+    if( !empty( $options ) && array_key_exists( $field_name, $options ) )
+      $checked = $options[$field_name] ? 'checked' : '';
+
+    echo '<label for="' .  $field_name . '"><input type="checkbox" name="globie_vimeo_sucker_settings[' .  $field_name . ']" id="' .  $field_name . '" value="1" ' . $checked . '> ' .  ucfirst($post_type) . '</label><br />';
+  }
+  echo "</fieldset>";
+}
+
+
+function globie_vimeo_sucker_settings_section_callback() { 
+  echo __( 'Select the post types where you want to enable the Viemo ID field', 'wordpress' );
+}
+
+function globie_vimeo_sucker_options_page() { 
+  echo '<form action="options.php" method="post">';
+  echo '<h2>Globie Vimeo Sucker Options</h2>';
+
+  settings_fields( 'globie_vimeo_sucker_options_page' );
+  do_settings_sections( 'globie_vimeo_sucker_options_page' );
+  submit_button();
+  
+  echo '</form>';
+
+}
+
+function pr( $var ) {
+  echo '<pre>';
+  print_r( $var );
+  echo '</pre>';
+}
