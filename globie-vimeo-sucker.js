@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Turn on spinner
     document.getElementById('globie-spinner').style.display = "inline-block";
-    vimeoId = document.getElementById('globie-vimeo-id-field');
+    vimeoId = document.getElementById('gvsucker-id-field');
     if( vimeoId.value == '' ) {
       alert('Vimeo ID needed');
       return;
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Set tags
         var tagsList = '', 
-          whitelist = globieVimeoSuckerOptions['gvsucker_input_whitelist'].toLowerCase();
+          whitelist = gVSuckerOptions['gvsucker_input_whitelist'].toLowerCase();
         vimeoData.tags.forEach( function(tag, index, tags) {
           // Check if tag is in the whitelist
           // If the whitelist is empty all pass
@@ -52,9 +52,9 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('new-tag-post_tag').value = tagsList;
 
         // Set video values
-        document.getElementById('globie-vimeo-width-field').value = vimeoData.width;
-        document.getElementById('globie-vimeo-height-field').value = vimeoData.height;
-        document.getElementById('globie-vimeo-ratio-field').value = (vimeoData.height/vimeoData.width);
+        document.getElementById('gvsucker-width-field').value = vimeoData.width;
+        document.getElementById('gvsucker-height-field').value = vimeoData.height;
+        document.getElementById('gvsucker-ratio-field').value = (vimeoData.height/vimeoData.width);
 
         // Set featured image
         var inside = document.getElementById('postimagediv').getElementsByClassName('inside')[0];
@@ -62,13 +62,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
         //    Set Thumbnail
         var featImg = document.createElement('img');
-        featImg.setAttribute('id', 'globie-vimeo-img');
+        featImg.setAttribute('id', 'gvsucker-img');
         featImg.setAttribute('src', vimeoData.pictures.sizes[2].link);
         featImg.setAttribute('width', 266);
         inside.appendChild(featImg);
 
         //    Set url in hidden field
-        document.getElementById('globie-vimeo-img-field').value = vimeoData.pictures.sizes[4].link;
+        document.getElementById('gvsucker-img-field').value = vimeoData.pictures.sizes[4].link;
 
       }
 

@@ -9,7 +9,7 @@
  * License: GPL2
 */
 
-class GVSucker {
+class Globie_Vimeo_Sucker {
   public function __construct() {
     register_activation_hook( __FILE__, array( $this, 'after_activation' ) );
     add_action('admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -40,7 +40,7 @@ class GVSucker {
     $options = get_option( 'gvsucker_settings' );
 
     // Pass options to js script
-    wp_localize_script( 'globie-vimeo-sucker-script', 'globieVimeoSuckerOptions', $options );
+    wp_localize_script( 'globie-vimeo-sucker-script', 'gVSuckerOptions', $options );
 
     // Enqueue script
     wp_enqueue_script( 'globie-vimeo-sucker-script' );
@@ -77,7 +77,7 @@ class GVSucker {
   public function vimeo_id_meta_box_callback( $post ) {
 
     // Add an nonce field so we can check for it later.
-    wp_nonce_field( 'globie_vimeo_sucker', 'globie_vimeo_sucker_nonce' );
+    wp_nonce_field( 'globie_vimeo_sucker', 'gvsucker_nonce' );
 
     /*
      * Use get_post_meta() to retrieve an existing value
@@ -88,15 +88,12 @@ class GVSucker {
     $vimeo_height_value = get_post_meta( $post->ID, '_vimeo_height_value', true );
     $vimeo_ratio_value = get_post_meta( $post->ID, '_vimeo_ratio_value', true );
 
-    echo '<label for="globie-vimeo-id-field">';
-    //_e( 'Vimeo ID goes here', 'globie_vimeo_id' );
-    echo '</label> ';
-    echo '<input type="text" id="globie-vimeo-id-field" name="globie-vimeo-id-field" value="' . esc_attr( $vimeo_id_value ) . '" size="25" />';
-    echo '<input type="hidden" id="globie-vimeo-img-field" name="globie-vimeo-img-field" value="" />';
+    echo '<input type="text" id="gvsucker-id-field" name="gvsucker-id-field" value="' . esc_attr( $vimeo_id_value ) . '" size="25" />';
+    echo '<input type="hidden" id="gvsucker-img-field" name="gvsucker-img-field" value="" />';
 
-    echo '<input type="hidden" id="globie-vimeo-width-field" name="globie-vimeo-width-field" value="' . esc_attr( $vimeo_width_value ) . '" />';
-    echo '<input type="hidden" id="globie-vimeo-height-field" name="globie-vimeo-height-field" value="' . esc_attr( $vimeo_height_value ) . '" />';
-    echo '<input type="hidden" id="globie-vimeo-ratio-field" name="globie-vimeo-ratio-field" value="' . esc_attr( $vimeo_ratio_value ) . '" />';
+    echo '<input type="hidden" id="gvsucker-width-field" name="gvsucker-width-field" value="' . esc_attr( $vimeo_width_value ) . '" />';
+    echo '<input type="hidden" id="gvsucker-height-field" name="gvsucker-height-field" value="' . esc_attr( $vimeo_height_value ) . '" />';
+    echo '<input type="hidden" id="gvsucker-ratio-field" name="gvsucker-ratio-field" value="' . esc_attr( $vimeo_ratio_value ) . '" />';
 
     echo ' <input type="submit" id="suck-vimeo-data" value="Suck it!" class="button">';
     echo ' <div id="globie-spinner" style="background: url(\'/wp-admin/images/wpspin_light.gif\') no-repeat; background-size: 16px 16px; display: none; opacity: .7; filter: alpha(opacity=70); width: 16px; height: 16px; margin: 0 10px;"></div>';
@@ -105,12 +102,12 @@ class GVSucker {
   public function save_vimeo_id( $post_id ) {
 
     // Check nonce
-    if ( ! isset( $_POST['globie_vimeo_sucker_nonce'] ) ) {
+    if ( ! isset( $_POST['gvsucker_nonce'] ) ) {
       return;
     }
 
     // Verify nonce
-    if ( ! wp_verify_nonce( $_POST['globie_vimeo_sucker_nonce'], 'globie_vimeo_sucker' ) ) {
+    if ( ! wp_verify_nonce( $_POST['gvsucker_nonce'], 'globie_vimeo_sucker' ) ) {
       return;
     }
 
@@ -127,20 +124,20 @@ class GVSucker {
     // OK, it's safe for us to save the data now.
 
     // Make sure that vimeo ID is set.
-    if ( ! isset( $_POST['globie-vimeo-id-field'] ) ) {
+    if ( ! isset( $_POST['gvsucker-id-field'] ) ) {
       return;
     }
 
     // Sanitize vimeo ID input
-    $vimeo_id = sanitize_text_field( $_POST['globie-vimeo-id-field'] );
+    $vimeo_id = sanitize_text_field( $_POST['gvsucker-id-field'] );
 
     // Update the vimeo ID field in the database.
     update_post_meta( $post_id, '_vimeo_id_value', $vimeo_id );
 
     // Sanitize video values
-    $vimeo_width = sanitize_text_field( $_POST['globie-vimeo-width-field'] );
-    $vimeo_height = sanitize_text_field( $_POST['globie-vimeo-height-field'] );
-    $vimeo_ratio = sanitize_text_field( $_POST['globie-vimeo-ratio-field'] );
+    $vimeo_width = sanitize_text_field( $_POST['gvsucker-width-field'] );
+    $vimeo_height = sanitize_text_field( $_POST['gvsucker-height-field'] );
+    $vimeo_ratio = sanitize_text_field( $_POST['gvsucker-ratio-field'] );
 
     // Update meta values
     update_post_meta( $post_id, '_vimeo_width_value', $vimeo_width );
@@ -148,12 +145,12 @@ class GVSucker {
     update_post_meta( $post_id, '_vimeo_ratio_value', $vimeo_ratio ); 
 
     // Make sure that thumb url is set.
-    if ( ! isset( $_POST['globie-vimeo-img-field'] ) ) {
+    if ( ! isset( $_POST['gvsucker-img-field'] ) ) {
       return;
     }
 
     // Sanitize user input
-    $vimeo_img = sanitize_text_field( $_POST['globie-vimeo-img-field'] );
+    $vimeo_img = sanitize_text_field( $_POST['gvsucker-img-field'] );
     $upload_dir = wp_upload_dir();
 
     //Get the remote image and save to uploads directory
@@ -298,7 +295,7 @@ class GVSucker {
 
   }
 }
-$gVSucker = new GVSucker();
+$gVSucker = new Globie_Vimeo_Sucker();
 
 function pr( $var ) {
   echo '<pre>';
