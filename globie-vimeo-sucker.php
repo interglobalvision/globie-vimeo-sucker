@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Globie Vimeo Sucker
  * Plugin URI:
- * Description: Pull data directly from viemo and insert it on your post.
+ * Description: Pull data directly from Vimeo and insert it on your post.
  * Version: 1.0.0
  * Author: Interglobal Vision
  * Author URI: http://interglobal.vision
