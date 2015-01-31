@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Set tags
         var tagsList = '', 
-          whitelist = globieVimeoSuckerOptions['globie_vimeo_sucker_input_whitelist'].toLowerCase();
+          whitelist = globieVimeoSuckerOptions['gvsucker_input_whitelist'].toLowerCase();
         vimeoData.tags.forEach( function(tag, index, tags) {
           // Check if tag is in the whitelist
           // If the whitelist is empty all pass

@@ -20,12 +20,12 @@ class GVSucker {
   }
 
   public function after_activation() {
-    if( !get_option( 'globie_vimeo_sucker_settings' ) ) {
-      update_option( 'globie_vimeo_sucker_settings', array(
-        'globie_vimeo_sucker_checkbox_post_type_post' => true
+    if( !get_option( 'gvsucker_settings' ) ) {
+      update_option( 'gvsucker_settings', array(
+        'gvsucker_checkbox_post_type_post' => true
       ) );
     }
-    //delete_option( 'globie_vimeo_sucker_settings' );
+    //delete_option( 'gvsucker_settings' );
   }
 
   /** Load JS scripts
@@ -37,7 +37,7 @@ class GVSucker {
     wp_register_script( 'globie-vimeo-sucker-script', plugins_url( '/globie-vimeo-sucker.js', __FILE__ ), array( 'jquery' ) );
 
     // Get plugin options
-    $options = get_option( 'globie_vimeo_sucker_settings' );
+    $options = get_option( 'gvsucker_settings' );
 
     // Pass options to js script
     wp_localize_script( 'globie-vimeo-sucker-script', 'globieVimeoSuckerOptions', $options );
@@ -47,7 +47,7 @@ class GVSucker {
   }
 
   public function add_vimeo_field() {
-    $options = get_option( 'globie_vimeo_sucker_settings' );
+    $options = get_option( 'gvsucker_settings' );
 
     // Get post types
     $post_types= get_post_types(
@@ -57,12 +57,12 @@ class GVSucker {
     );
 
     foreach( $post_types as $post_type ) {
-      $field_name = 'globie_vimeo_sucker_checkbox_post_type_' . $post_type;
+      $field_name = 'gvsucker_checkbox_post_type_' . $post_type;
       if(array_key_exists( $field_name, $options ) ) {
         add_meta_box(
-          'globie-video-id-meta-box',
+          'gvsucker-vimeo-id-meta-box',
           'Vimeo ID',
-          array( $this, 'globie_vimeo_id_meta_box_callback' ),
+          array( $this, 'vimeo_id_meta_box_callback' ),
           $post_type
         );
       }
@@ -74,7 +74,7 @@ class GVSucker {
    *
    * @patam WP_Post $post The object for the current post.
    */
-  public function globie_vimeo_id_meta_box_callback( $post ) {
+  public function vimeo_id_meta_box_callback( $post ) {
 
     // Add an nonce field so we can check for it later.
     wp_nonce_field( 'globie_vimeo_sucker', 'globie_vimeo_sucker_nonce' );
@@ -199,46 +199,46 @@ class GVSucker {
   
   // Register settings, sections and fields
   public function settings_init() { 
-    register_setting( 'globie_vimeo_sucker_options_page', 'globie_vimeo_sucker_settings' );
+    register_setting( 'gvsucker_options_page', 'gvsucker_settings' );
 
     // Add post type section
     add_settings_section(
-      'globie_vimeo_sucker_globie_vimeo_sucker_post_types_section', 
+      'gvsucker_post_types_section', 
       __( 'Enable/Disbale on post types', 'wordpress' ), 
       array( $this, 'settings_section_callback' ),
-      'globie_vimeo_sucker_options_page'
+      'gvsucker_options_page'
     );
 
     // Post Types fields
     add_settings_field( 
-      'globie_vimeo_sucker_post_types_fields', 
+      'gvsucker_post_types_fields', 
       __( 'Post types', 'wordpress' ), 
       array( $this, 'settings_post_types_fields_render' ), 
-      'globie_vimeo_sucker_options_page', 
-      'globie_vimeo_sucker_globie_vimeo_sucker_post_types_section' 
+      'gvsucker_options_page', 
+      'gvsucker_post_types_section' 
     );
 
     // Add whitelist section
     add_settings_section(
-      'globie_vimeo_sucker_globie_vimeo_sucker_whitelist_section', 
+      'gvsucker_whitelist_section', 
       __( 'Tags whitelist', 'wordpress' ), 
       array( $this, 'settings_whitelist_section_callback' ),
-      'globie_vimeo_sucker_options_page'
+      'gvsucker_options_page'
     );
 
     // Whitelist field
     add_settings_field( 
-      'globie_vimeo_sucker_whitelist_fields', 
+      'gvsucker_whitelist_fields', 
       __( 'Tags', 'wordpress' ), 
       array( $this, 'settings_whitelist_field_render' ),
-      'globie_vimeo_sucker_options_page', 
-      'globie_vimeo_sucker_globie_vimeo_sucker_whitelist_section' 
+      'gvsucker_options_page', 
+      'gvsucker_whitelist_section' 
     );
   }
   
   public function settings_post_types_fields_render() {
     // Get options saved
-    $options = get_option( 'globie_vimeo_sucker_settings' );
+    $options = get_option( 'gvsucker_settings' );
 
     // Get post types
     $post_types= get_post_types(
@@ -250,14 +250,14 @@ class GVSucker {
     // Render fields
     echo "<fieldset>";
     foreach( $post_types as $post_type ) {
-      $field_name = 'globie_vimeo_sucker_checkbox_post_type_' . $post_type;
+      $field_name = 'gvsucker_checkbox_post_type_' . $post_type;
       $checked = '';
 
       // Check if field is checked
       if( !empty( $options ) && array_key_exists( $field_name, $options ) )
         $checked = 'checked';
 
-      echo '<label for="' .  $field_name . '"><input type="checkbox" name="globie_vimeo_sucker_settings[' .  $field_name . ']" id="' .  $field_name . '" value="1" ' . $checked . '> ' .  ucfirst($post_type) . '</label><br />';
+      echo '<label for="' .  $field_name . '"><input type="checkbox" name="gvsucker_settings[' .  $field_name . ']" id="' .  $field_name . '" value="1" ' . $checked . '> ' .  ucfirst($post_type) . '</label><br />';
     }
     echo "</fieldset>";
   }
@@ -269,16 +269,16 @@ class GVSucker {
   public function settings_whitelist_field_render() { 
 
     // Get options saved
-    $options = get_option( 'globie_vimeo_sucker_settings' );
+    $options = get_option( 'gvsucker_settings' );
 
-    if(array_key_exists('globie_vimeo_sucker_input_whitelist', $options ) )
-      $whitelist = $options['globie_vimeo_sucker_input_whitelist'];
+    if(array_key_exists('gvsucker_input_whitelist', $options ) )
+      $whitelist = $options['gvsucker_input_whitelist'];
     else
       $whitelist = '';
 
     // Render fields
     echo "<fieldset>";
-    echo '<label for="globie_vimeo_sucker_input_whitelist"><input type="text" name="globie_vimeo_sucker_settings[globie_vimeo_sucker_input_whitelist]" id="globie_vimeo_sucker_input_whitelist" value="' . $whitelist  . '"></label><br />';
+    echo '<label for="gvsucker_input_whitelist"><input type="text" name="gvsucker_settings[gvsucker_input_whitelist]" id="gvsucker_input_whitelist" value="' . $whitelist  . '"></label><br />';
     echo "</fieldset>";
   }
 
@@ -290,8 +290,8 @@ class GVSucker {
     echo '<form action="options.php" method="post">';
     echo '<h2>Globie Vimeo Sucker Options</h2>';
 
-    settings_fields( 'globie_vimeo_sucker_options_page' );
-    do_settings_sections( 'globie_vimeo_sucker_options_page' );
+    settings_fields( 'gvsucker_options_page' );
+    do_settings_sections( 'gvsucker_options_page' );
     submit_button();
     
     echo '</form>';
