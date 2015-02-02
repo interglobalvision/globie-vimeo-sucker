@@ -275,7 +275,7 @@ class Globie_Vimeo_Sucker {
 
     // Render fields
     echo "<fieldset>";
-    echo '<label for="gvsucker_input_whitelist"><input type="text" name="gvsucker_settings[gvsucker_input_whitelist]" id="gvsucker_input_whitelist" value="' . $whitelist  . '"></label><br />';
+    echo '<label for="gvsucker_input_whitelist" style="width: 100%;"><input type="text" style="width: 100%;" name="gvsucker_settings[gvsucker_input_whitelist]" id="gvsucker_input_whitelist" value="' . $whitelist  . '"></label><br />';
     echo "</fieldset>";
   }
 
