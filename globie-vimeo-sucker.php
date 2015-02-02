@@ -98,7 +98,7 @@ class Globie_Vimeo_Sucker {
     echo ' <input type="submit" id="suck-vimeo-data" value="Suck it!" class="button">';
     echo ' <div id="globie-spinner" style="background: url(\'/wp-admin/images/wpspin_light.gif\') no-repeat; background-size: 16px 16px; display: none; opacity: .7; filter: alpha(opacity=70); width: 16px; height: 16px; margin: 0 10px;"></div>';
   }
-  
+
   public function save_vimeo_id( $post_id ) {
 
     // Check nonce
@@ -142,7 +142,7 @@ class Globie_Vimeo_Sucker {
     // Update meta values
     update_post_meta( $post_id, '_vimeo_width_value', $vimeo_width );
     update_post_meta( $post_id, '_vimeo_height_value', $vimeo_height );
-    update_post_meta( $post_id, '_vimeo_ratio_value', $vimeo_ratio ); 
+    update_post_meta( $post_id, '_vimeo_ratio_value', $vimeo_ratio );
 
     // Make sure that thumb url is set.
     if ( ! isset( $_POST['gvsucker-img-field'] ) ) {
@@ -184,7 +184,7 @@ class Globie_Vimeo_Sucker {
 
   }
 
-  public function add_admin_menu() { 
+  public function add_admin_menu() {
     add_options_page(
       'Globie Vimeo Sucker Options',
       'Globie Vimeo Sucker',
@@ -193,46 +193,46 @@ class Globie_Vimeo_Sucker {
       array( $this, 'options_page' )
     );
   }
-  
+
   // Register settings, sections and fields
-  public function settings_init() { 
+  public function settings_init() {
     register_setting( 'gvsucker_options_page', 'gvsucker_settings' );
 
     // Add post type section
     add_settings_section(
-      'gvsucker_post_types_section', 
-      __( 'Enable/Disbale on post types', 'wordpress' ), 
+      'gvsucker_post_types_section',
+      __( 'Enable/Disable on post types', 'wordpress' ),
       array( $this, 'settings_section_callback' ),
       'gvsucker_options_page'
     );
 
     // Post Types fields
-    add_settings_field( 
-      'gvsucker_post_types_fields', 
-      __( 'Post types', 'wordpress' ), 
-      array( $this, 'settings_post_types_fields_render' ), 
-      'gvsucker_options_page', 
-      'gvsucker_post_types_section' 
+    add_settings_field(
+      'gvsucker_post_types_fields',
+      __( 'Post types', 'wordpress' ),
+      array( $this, 'settings_post_types_fields_render' ),
+      'gvsucker_options_page',
+      'gvsucker_post_types_section'
     );
 
     // Add whitelist section
     add_settings_section(
-      'gvsucker_whitelist_section', 
-      __( 'Tags whitelist', 'wordpress' ), 
+      'gvsucker_whitelist_section',
+      __( 'Tags whitelist', 'wordpress' ),
       array( $this, 'settings_whitelist_section_callback' ),
       'gvsucker_options_page'
     );
 
     // Whitelist field
-    add_settings_field( 
-      'gvsucker_whitelist_fields', 
-      __( 'Tags', 'wordpress' ), 
+    add_settings_field(
+      'gvsucker_whitelist_fields',
+      __( 'Tags', 'wordpress' ),
       array( $this, 'settings_whitelist_field_render' ),
-      'gvsucker_options_page', 
-      'gvsucker_whitelist_section' 
+      'gvsucker_options_page',
+      'gvsucker_whitelist_section'
     );
   }
-  
+
   public function settings_post_types_fields_render() {
     // Get options saved
     $options = get_option( 'gvsucker_settings' );
@@ -259,11 +259,11 @@ class Globie_Vimeo_Sucker {
     echo "</fieldset>";
   }
 
-  public function settings_section_callback() { 
-    echo __( 'Select the post types where you want to enable the Viemo ID field', 'wordpress' );
+  public function settings_section_callback() {
+    echo __( 'Select the post types where you want to enable the Vimeo ID field', 'wordpress' );
   }
 
-  public function settings_whitelist_field_render() { 
+  public function settings_whitelist_field_render() {
 
     // Get options saved
     $options = get_option( 'gvsucker_settings' );
@@ -279,18 +279,18 @@ class Globie_Vimeo_Sucker {
     echo "</fieldset>";
   }
 
-  public function settings_whitelist_section_callback() { 
+  public function settings_whitelist_section_callback() {
     echo __( 'Comma separeted list of whitelisted tags', 'wordpress' );
   }
 
-  public function options_page() { 
+  public function options_page() {
     echo '<form action="options.php" method="post">';
     echo '<h2>Globie Vimeo Sucker Options</h2>';
 
     settings_fields( 'gvsucker_options_page' );
     do_settings_sections( 'gvsucker_options_page' );
     submit_button();
-    
+
     echo '</form>';
 
   }
