@@ -280,7 +280,7 @@ class Globie_Vimeo_Sucker {
   }
 
   public function settings_whitelist_section_callback() {
-    echo __( 'Comma separeted list of whitelisted tags', 'wordpress' );
+    echo __( 'Comma separated list of whitelisted tags', 'wordpress' );
   }
 
   public function options_page() {
