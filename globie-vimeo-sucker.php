@@ -20,16 +20,22 @@ class Globie_Vimeo_Sucker {
   }
 
   public function after_activation() {
+    
+    // Check if previous settins aren't stored
     if( !get_option( 'gvsucker_settings' ) ) {
+
+      // Enable Vimeo field on "posts" post type
       update_option( 'gvsucker_settings', array(
         'gvsucker_checkbox_post_type_post' => true
       ) );
+
     }
     //delete_option( 'gvsucker_settings' );
   }
 
-  /** Load JS scripts
-   *  Only on post.php and post-new.php
+  /** 
+   * Load JS scripts
+   * Only on post.php and post-new.php
    */
   public function enqueue_scripts( $hook ){
     if( 'post.php' != $hook && 'post-new.php' != $hook )
@@ -58,7 +64,7 @@ class Globie_Vimeo_Sucker {
 
     foreach( $post_types as $post_type ) {
       $field_name = 'gvsucker_checkbox_post_type_' . $post_type;
-      if(array_key_exists( $field_name, $options ) ) {
+      if(isset( $options[$field_name] ) ) {
         add_meta_box(
           'gvsucker-vimeo-id-meta-box',
           'Vimeo ID',
@@ -237,6 +243,7 @@ class Globie_Vimeo_Sucker {
     // Get options saved
     $options = get_option( 'gvsucker_settings' );
 
+    pr( $options );
     // Get post types
     $post_types= get_post_types(
       array(
@@ -251,7 +258,7 @@ class Globie_Vimeo_Sucker {
       $checked = '';
 
       // Check if field is checked
-      if( !empty( $options ) && array_key_exists( $field_name, $options ) )
+      if( !empty( $options ) && isset( $options[$field_name] ) )
         $checked = 'checked';
 
       echo '<label for="' .  $field_name . '"><input type="checkbox" name="gvsucker_settings[' .  $field_name . ']" id="' .  $field_name . '" value="1" ' . $checked . '> ' .  ucfirst($post_type) . '</label><br />';
