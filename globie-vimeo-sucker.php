@@ -45,7 +45,9 @@ class Globie_Vimeo_Sucker {
     $whitelist = get_option( 'gvsucker_settings_whitelist' );
 
     // Pass options to js script
-    wp_localize_script( 'globie-vimeo-sucker-script', 'gVSuckerWhitelist', $whitelist );
+    wp_localize_script( 'globie-vimeo-sucker-script', 'gVSucker', array( 
+      "whitelist" => $whitelist 
+    ) );
 
     // Enqueue script
     wp_enqueue_script( 'globie-vimeo-sucker-script' );
