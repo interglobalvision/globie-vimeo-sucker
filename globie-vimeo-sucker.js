@@ -3,13 +3,14 @@ document.addEventListener("DOMContentLoaded", function() {
   suckDataButton.addEventListener("click", function(e) {
     e.preventDefault();
 
-    // Turn on spinner
-    document.getElementById('globie-spinner').style.display = "inline-block";
     vimeoId = document.getElementById('gvsucker-id-field');
     if( vimeoId.value == '' ) {
       alert('Vimeo ID needed');
       return;
     }
+
+    // Turn on spinner
+    document.getElementById('globie-spinner').style.display = "inline-block";
 
     // Get access token
     // TODO: Get token from hidden field
