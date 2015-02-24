@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function() {
       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
     }
     xmlhttp.setRequestHeader("Authorization", "bearer a0c52130c00d1382bb992ebc59abc9cf");
-    xmlhttp.setRequestHeader("Authorization", "bearer a0c52130c00d1382bb992ebc59abc9c");
     xmlhttp.onreadystatechange = function() {
       console.log(xmlhttp.responseText);
       if( xmlhttp.readyState == 4 ) {
