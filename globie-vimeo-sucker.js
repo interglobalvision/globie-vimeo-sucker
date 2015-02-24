@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
     } else {
       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
     }
+    xmlhttp.open('GET', 'https://api.vimeo.com/videos/' + vimeoId.value, true);
     xmlhttp.setRequestHeader("Authorization", "bearer a0c52130c00d1382bb992ebc59abc9cf");
     xmlhttp.onreadystatechange = function() {
       console.log(xmlhttp.responseText);
