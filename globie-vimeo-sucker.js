@@ -33,9 +33,23 @@ document.addEventListener("DOMContentLoaded", function() {
           console.log(vimeoData.width);
           console.log(vimeoData.height);
 
+          // Split the vimeo title
+          var titleArray = vimeoData.name.split('"');
+          //         console.log(titleArray);
+
+          // Tidy the split strings. input must follow exact spacing pattern for this to work
+          var videoBrand = titleArray[0].substring(0, titleArray[0].length-1);
+          var videoTitle = titleArray[1];
+          var videoDirector = titleArray[2].substring(4, titleArray[2].length);
+
           // Set title
           document.getElementById('title').focus();
           document.getElementById('title').value = vimeoData.name;
+
+          // Set meta
+          document.getElementById('_igv_title').value = videoTitle;
+          document.getElementById('_igv_brand').value = videoBrand;
+          selectOption('_igv_director', videoDirector);
 
           // Set content
           window.switchEditors.switchto({id: "content-html"});
@@ -44,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
           // Set tags
           var tagsList = '', 
-            whitelist = gVSucker.whitelist.toLowerCase();
+          whitelist = gVSucker.whitelist.toLowerCase();
           vimeoData.tags.forEach( function(tag, index, tags) {
             // Check if tag is in the whitelist
             // If the whitelist is empty all pass
@@ -78,9 +92,19 @@ document.addEventListener("DOMContentLoaded", function() {
           alert("Vimeo Error: " + responseText.error);
       }
 
-    // Turn off spinner
-    document.getElementById('globie-spinner').style.display = "none";
+      // Turn off spinner
+      document.getElementById('globie-spinner').style.display = "none";
     }
     xmlhttp.send();
   });
 });
+
+//  This function selects an option in a select according to its text value
+function selectOption(selectId, selectText) {
+  var select = document.getElementById(selectId);
+  for (var i = 0; i < select.length; i++) {
+    if (select.options[i].text == selectText ) {
+      select.selectedIndex = i;
+    }
+  }
+}
