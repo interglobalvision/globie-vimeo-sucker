@@ -115,10 +115,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
 //  This function selects an option in a select according to its text value
 function selectOption(selectId, selectText) {
-  var select = document.getElementById(selectId);
+  var select = document.getElementById(selectId),
+      selected = false;
   for (var i = 0; i < select.length; i++) {
     if (select.options[i].text == selectText ) {
       select.selectedIndex = i;
+      selected = true;
     }
+  }
+  if ( ! selected ) {
+    alert( "\"" + selectText + "\" is not a director. Please add the director before adding their videos." );
   }
 }
