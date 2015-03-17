@@ -38,9 +38,16 @@ document.addEventListener("DOMContentLoaded", function() {
           document.getElementById('title').value = vimeoData.name;
 
           // Set content
-          window.switchEditors.switchto({id: "content-html"});
-          document.getElementById('content').value = vimeoData.description;
-          window.switchEditors.switchto({id: "content-tmce"});
+          // For Visual editor
+          if( document.getElementById('content-tmce') ) {
+            window.switchEditors.switchto({id: "content-html"});
+            document.getElementById('content').value = vimeoData.description;
+            window.switchEditors.switchto({id: "content-tmce"});
+            
+          // For Text editor
+          } else {
+            document.querySelector('.wp-editor-area').value = vimeoData.description;
+          }
 
           // Set tags
           var tagsList = '', 
