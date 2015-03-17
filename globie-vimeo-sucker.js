@@ -77,7 +77,12 @@ document.addEventListener("DOMContentLoaded", function() {
           inside.appendChild(featImg);
 
           //    Set url in hidden field
-          document.getElementById('gvsucker-img-field').value = vimeoData.pictures.sizes[4].link;
+          if (vimeoData.pictures.sizes.length === 6) {
+            vimeoThumb = vimeoData.pictures.sizes[5].link;
+          } else {
+            vimeoThumb = vimeoData.pictures.sizes[4].link;
+          }
+          document.getElementById('gvsucker-img-field').value = vimeoThumb;
         }
       } else {
         var responseText = JSON.parse(xmlhttp.responseText);
