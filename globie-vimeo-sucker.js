@@ -25,7 +25,6 @@ document.addEventListener("DOMContentLoaded", function() {
     xmlhttp.open('GET', 'https://api.vimeo.com/videos/' + vimeoId.value, true);
     xmlhttp.setRequestHeader("Authorization", "bearer a0c52130c00d1382bb992ebc59abc9cf");
     xmlhttp.onreadystatechange = function() {
-      console.log(xmlhttp.responseText);
       if( xmlhttp.readyState == 4 ) {
         if( xmlhttp.status == 200 ) {
           var vimeoData = JSON.parse(xmlhttp.responseText);
@@ -85,9 +84,12 @@ document.addEventListener("DOMContentLoaded", function() {
           document.getElementById('gvsucker-img-field').value = vimeoThumb;
         }
       } else {
-        var responseText = JSON.parse(xmlhttp.responseText);
-        if( responseText.error)
-          alert("Vimeo Error: " + responseText.error);
+        if( xmlhttp.responseText ) {
+          var responseText = JSON.parse(xmlhttp.responseText);
+          if ( responseText.error) {
+            alert("Vimeo Error: " + responseText.error);
+          }
+        }
       }
 
     // Turn off spinner
