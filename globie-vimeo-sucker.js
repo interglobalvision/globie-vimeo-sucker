@@ -35,6 +35,15 @@ document.addEventListener("DOMContentLoaded", function() {
           var videoTitle = titleArray[1];
           var videoDirector = titleArray[2].substring(4, titleArray[2].length);
 
+          // Split the vimeo title
+          var titleArray = vimeoData.name.split('"');
+          //         console.log(titleArray);
+
+          // Tidy the split strings. input must follow exact spacing pattern for this to work
+          var videoBrand = titleArray[0].substring(0, titleArray[0].length-1);
+          var videoTitle = titleArray[1];
+          var videoDirector = titleArray[2].substring(4, titleArray[2].length);
+
           // Set title
           document.getElementById('title').focus();
           document.getElementById('title').value = vimeoData.name;
@@ -45,9 +54,16 @@ document.addEventListener("DOMContentLoaded", function() {
           selectOption('_igv_director', videoDirector);
 
           // Set content
-          window.switchEditors.switchto({id: "content-html"});
-          document.getElementById('content').value = vimeoData.description;
-          window.switchEditors.switchto({id: "content-tmce"});
+          // For Visual editor
+          if( document.getElementById('content-tmce') ) {
+            window.switchEditors.switchto({id: "content-html"});
+            document.getElementById('content').value = vimeoData.description;
+            window.switchEditors.switchto({id: "content-tmce"});
+
+          // For Text editor
+          } else {
+            document.querySelector('.wp-editor-area').value = vimeoData.description;
+          }
 
           // Set tags
           var tagsList = '',
@@ -59,6 +75,10 @@ document.addEventListener("DOMContentLoaded", function() {
               tagsList += tag.name + ", ";
             }
           });
+
+          console.log(vimeoData.tags);
+          console.log(whitelist);
+          console.log(tagsList);
 
           document.getElementById('new-tag-post_tag').value = tagsList;
 
@@ -87,9 +107,11 @@ document.addEventListener("DOMContentLoaded", function() {
           document.getElementById('gvsucker-img-field').value = vimeoThumb;
         }
       } else {
-        var responseText = JSON.parse(xmlhttp.responseText);
-        if ( responseText.error) {
-          alert("Vimeo Error: " + responseText.error);
+        if( xmlhttp.responseText ) {
+          var responseText = JSON.parse(xmlhttp.responseText);
+          if ( responseText.error) {
+            alert("Vimeo Error: " + responseText.error);
+          }
         }
       }
 
