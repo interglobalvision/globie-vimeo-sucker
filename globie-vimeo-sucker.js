@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
+  console.log('Globie vimeo sucker');
   var suckDataButton = document.getElementById('suck-vimeo-data');
   suckDataButton.addEventListener("click", function(e) {
     e.preventDefault();
