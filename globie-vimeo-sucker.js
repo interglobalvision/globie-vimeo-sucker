@@ -82,6 +82,8 @@ document.addEventListener("DOMContentLoaded", function() {
           } else {
             vimeoThumb = vimeoData.pictures.sizes[4].link;
           }
+          // Remove any POST params in the image url
+          vimeoThumb = vimeoThumb .split('?')[0];
           document.getElementById('gvsucker-img-field').value = vimeoThumb;
         }
       } else {
