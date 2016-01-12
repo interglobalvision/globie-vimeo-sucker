@@ -37,9 +37,16 @@ class Globie_Vimeo_Sucker {
    * Only on post.php and post-new.php
    */
   public function enqueue_scripts( $hook ){
-    if( 'post.php' != $hook && 'post-new.php' != $hook )
+    if( 'post.php' != $hook && 'post-new.php' != $hook ) {
       return;
-    wp_register_script( 'globie-vimeo-sucker-script', plugins_url( '/globie-vimeo-sucker.js', __FILE__ ), array( 'jquery' ) );
+    }
+
+    global $post_type;
+    $saved_post_types = get_option( 'gvsucker_settings_post_types' );
+
+    if( in_array( $post_type, $saved_post_types ) ) {
+      wp_register_script( 'globie-vimeo-sucker-script', plugins_url( '/globie-vimeo-sucker.js', __FILE__ ), array( 'jquery' ) );
+    }
 
     // Get plugin options
     $whitelist = get_option( 'gvsucker_settings_whitelist' );

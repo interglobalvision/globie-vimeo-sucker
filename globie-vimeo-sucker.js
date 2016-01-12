@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
+  console.log('Globie vimeo sucker');
   var suckDataButton = document.getElementById('suck-vimeo-data');
   suckDataButton.addEventListener("click", function(e) {
     e.preventDefault();
@@ -56,10 +57,9 @@ document.addEventListener("DOMContentLoaded", function() {
           // Set content
           // For Visual editor
           if( document.getElementById('content-tmce') ) {
-            window.switchEditors.switchto({id: "content-html"});
+            window.switchEditors.go('content', 'html');
             document.getElementById('content').value = vimeoData.description;
-            window.switchEditors.switchto({id: "content-tmce"});
-
+            window.switchEditors.go('content', 'tmce');
           // For Text editor
           } else {
             document.querySelector('.wp-editor-area').value = vimeoData.description;
@@ -104,6 +104,8 @@ document.addEventListener("DOMContentLoaded", function() {
           } else {
             vimeoThumb = vimeoData.pictures.sizes[4].link;
           }
+          // Remove any POST params in the image url
+          vimeoThumb = vimeoThumb .split('?')[0];
           document.getElementById('gvsucker-img-field').value = vimeoThumb;
         }
       } else {
