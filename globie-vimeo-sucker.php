@@ -9,6 +9,22 @@
  * License: GPL2
 */
 
+
+function wp_enqueue_cdn_script( $handle, $src_cdn = false, $src_local = false, $deps = array(), $ver = false, $in_footer = false ) {
+  $cdnIsUp = get_transient( $handle . '_script_cdn_is_up' );
+  if ( $cdnIsUp ) {
+    wp_enqueue_script( $handle, $src_cdn, $deps, $ver, $in_footer );
+  } else {
+    $cdn_response = wp_remote_get( $src_cdn );
+    if ( is_wp_error( $cdn_response ) || wp_remote_retrieve_response_code( $cdn_response ) != '200' ) {
+      wp_enqueue_script( $handle, $src_local, $deps, $ver, $in_footer );
+    } else {
+      $cdnIsUp = set_transient( $handle . '_script_cdn_is_up', true, MINUTE_IN_SECONDS * 20 );
+      wp_enqueue_script( $handle, $src_cdn, $deps, $ver, $in_footer );
+    }
+  }
+}
+
 class Globie_Vimeo_Sucker {
   public function __construct() {
     register_activation_hook( __FILE__, array( $this, 'after_activation' ) );
@@ -20,7 +36,7 @@ class Globie_Vimeo_Sucker {
   }
 
   public function after_activation() {
-    
+
     // Check if previous settins aren't stored
     if( !get_option( 'gvsucker_settings_post_types' ) ) {
       // Enable Vimeo field on "posts" post type
@@ -32,7 +48,7 @@ class Globie_Vimeo_Sucker {
     //delete_option( 'gvsucker_settings_whitelist' );
   }
 
-  /** 
+  /**
    * Load JS scripts
    * Only on post.php and post-new.php
    */
@@ -52,8 +68,8 @@ class Globie_Vimeo_Sucker {
     $whitelist = get_option( 'gvsucker_settings_whitelist' );
 
     // Pass options to js script
-    wp_localize_script( 'globie-vimeo-sucker-script', 'gVSucker', array( 
-      "whitelist" => $whitelist 
+    wp_localize_script( 'globie-vimeo-sucker-script', 'gVSucker', array(
+      "whitelist" => $whitelist
     ) );
 
     // Enqueue script
@@ -111,7 +127,7 @@ class Globie_Vimeo_Sucker {
     }
 
     // Verify nonce
-    if ( ! wp_verify_nonce( $_POST['gvsucker_nonce'], 'globie_vimeo_sucker' ) ) {
+    if ( ! wp_verify_nonce( $_POST['gvsucker_nonce'], '' ) ) {
       return;
     }
 
@@ -298,6 +314,8 @@ class Globie_Vimeo_Sucker {
   }
 }
 $gVSucker = new Globie_Vimeo_Sucker();
+
+
 
 function pr( $var ) {
   echo '<pre>';
