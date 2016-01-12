@@ -40,9 +40,9 @@ document.addEventListener("DOMContentLoaded", function() {
           // Set content
           // For Visual editor
           if( document.getElementById('content-tmce') ) {
-            window.switchEditors.switchto({id: "content-html"});
+            window.switchEditors.go('content', 'html');
             document.getElementById('content').value = vimeoData.description;
-            window.switchEditors.switchto({id: "content-tmce"});
+            window.switchEditors.go('content', 'tmce');
             
           // For Text editor
           } else {
