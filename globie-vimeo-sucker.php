@@ -48,6 +48,7 @@ class Globie_Vimeo_Sucker {
     $saved_post_types = get_option( 'gvsucker_settings_post_types' );
 
     if( in_array( $post_type, $saved_post_types ) ) {
+      wp_register_script( 'globie-vimeo-sucker-get-video-id', plugins_url( '/globie-vimeo-sucker.js', __FILE__ ), array( 'jquery' ) );
       wp_register_script( 'globie-vimeo-sucker-script', plugins_url( '/globie-vimeo-sucker.js', __FILE__ ), array( 'jquery' ) );
     }
 
@@ -55,8 +56,9 @@ class Globie_Vimeo_Sucker {
     $whitelist = get_option( 'gvsucker_settings_whitelist' );
 
     // Pass options to js script
-    wp_localize_script( 'globie-vimeo-sucker-script', 'gVSucker', array(
-      "whitelist" => $whitelist
+    wp_localize_script( 'globie-vimeo-sucker-script', 'GVS', array(
+      'whitelist' => $whitelist,
+      'apiUrl' => home_url() . '/wp-json/globie-video-sucker/v1/',
     ) );
 
     // Enqueue script
@@ -224,7 +226,7 @@ class Globie_Vimeo_Sucker {
     );
 
     // Register option: post types
-    register_setting( 'gvsucker_options_page', 'gvsucker_settings_youtube_key' );
+    register_setting( 'gvsucker_options_page', 'gvsucker_settings_post_types' );
 
     // Add post type section
     add_settings_section(
@@ -334,7 +336,7 @@ class Globie_Vimeo_Sucker {
 
   }
 }
-$gVSucker = new Globie_Vimeo_Sucker();
+$GVS = new Globie_Vimeo_Sucker();
 
 add_action( 'rest_api_init', 'dt_register_api_hooks' );
 function dt_register_api_hooks() {
