@@ -8,24 +8,10 @@
  * Author URI: http://interglobal.vision
  * License: GPL2
 */
-
-
-function wp_enqueue_cdn_script( $handle, $src_cdn = false, $src_local = false, $deps = array(), $ver = false, $in_footer = false ) {
-  $cdnIsUp = get_transient( $handle . '_script_cdn_is_up' );
-  if ( $cdnIsUp ) {
-    wp_enqueue_script( $handle, $src_cdn, $deps, $ver, $in_footer );
-  } else {
-    $cdn_response = wp_remote_get( $src_cdn );
-    if ( is_wp_error( $cdn_response ) || wp_remote_retrieve_response_code( $cdn_response ) != '200' ) {
-      wp_enqueue_script( $handle, $src_local, $deps, $ver, $in_footer );
-    } else {
-      $cdnIsUp = set_transient( $handle . '_script_cdn_is_up', true, MINUTE_IN_SECONDS * 20 );
-      wp_enqueue_script( $handle, $src_cdn, $deps, $ver, $in_footer );
-    }
-  }
-}
+require 'vendor/autoload.php';
 
 class Globie_Vimeo_Sucker {
+
   public function __construct() {
     register_activation_hook( __FILE__, array( $this, 'after_activation' ) );
     add_action('admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -44,6 +30,7 @@ class Globie_Vimeo_Sucker {
         0 => 'post'
       ) );
     }
+
     //delete_option( 'gvsucker_settings_post_types' );
     //delete_option( 'gvsucker_settings_whitelist' );
   }
@@ -127,7 +114,7 @@ class Globie_Vimeo_Sucker {
     }
 
     // Verify nonce
-    if ( ! wp_verify_nonce( $_POST['gvsucker_nonce'], '' ) ) {
+    if ( ! wp_verify_nonce( $_POST['gvsucker_nonce'], 'globie_vimeo_sucker' ) ) {
       return;
     }
 
@@ -216,8 +203,28 @@ class Globie_Vimeo_Sucker {
 
   // Register settings, sections and fields
   public function settings_init() {
+    // Register option: youtube_key
+    register_setting( 'gvsucker_options_page', 'gvsucker_settings_youtube_key' );
+
+    // Add youtube_key section
+    add_settings_section(
+      'gvsucker_youtube_key_section',
+      __( 'Youtube API key', 'wordpress' ),
+      array( $this, 'settings_youtube_key_section_callback' ),
+      'gvsucker_options_page'
+    );
+
+    // youtube_key field
+    add_settings_field(
+      'gvsucker_youtube_key_fields',
+      __( 'Youtube ID', 'wordpress' ),
+      array( $this, 'settings_youtube_key_field_render' ),
+      'gvsucker_options_page',
+      'gvsucker_youtube_key_section'
+    );
+
     // Register option: post types
-    register_setting( 'gvsucker_options_page', 'gvsucker_settings_post_types' );
+    register_setting( 'gvsucker_options_page', 'gvsucker_settings_youtube_key' );
 
     // Add post type section
     add_settings_section(
@@ -255,6 +262,20 @@ class Globie_Vimeo_Sucker {
       'gvsucker_options_page',
       'gvsucker_whitelist_section'
     );
+  }
+
+  public function settings_youtube_key_section_callback() {
+    echo __( '', 'wordpress' );
+  }
+
+  public function settings_youtube_key_field_render() {
+    // Get options saved
+    $youtube_key = get_option( 'gvsucker_settings_youtube_key' );
+
+    // Render fields
+    echo "<fieldset>";
+    echo '<label for="gvsucker_input_youtube_key" style="width: 100%;"><input type="text" style="width: 100%;" name="gvsucker_settings_youtube_key" id="gvsucker_input_youtube_key" value="' . $youtube_key  . '"></label><br />';
+    echo "</fieldset>";
   }
 
   public function settings_post_types_fields_render() {
@@ -315,10 +336,29 @@ class Globie_Vimeo_Sucker {
 }
 $gVSucker = new Globie_Vimeo_Sucker();
 
+add_action( 'rest_api_init', 'dt_register_api_hooks' );
+function dt_register_api_hooks() {
+  // Add deep-thoughts/v1/get-all-post-ids route
+  register_rest_route( 'globie-video-sucker/v1', '/video/(?P<id>[a-zA-Z0-9-]+)', array(
+    'methods' => 'GET',
+    'callback' => 'get_video_data',
+  ) );
+}
 
+function get_video_data($data) {
 
-function pr( $var ) {
-  echo '<pre>';
-  print_r( $var );
-  echo '</pre>';
+  $id = $data['id'];
+  // TODO: validate either id or url
+
+  // Get youtube id from options
+  $youtube_key = get_option( 'gvsucker_settings_youtube_key' );
+
+  // Init youtube with Key
+  $youtube = new Madcoda\Youtube\Youtube(array('key' =>  $youtube_key));
+
+  // Get video info
+  $video = $youtube->getVideoInfo($id);
+
+  return $video;
+
 }
