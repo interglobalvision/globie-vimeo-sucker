@@ -1,0 +1,7 @@
+{
+    "name": "igv/globie-video-sucker",
+    "type": "wordpress-plugin",
+    "require": {
+        "madcoda/php-youtube-api": "^1.2"
+    }
+}

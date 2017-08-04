@@ -1,38 +1,41 @@
 <?php
 /**
- * Plugin Name: Globie Vimeo Sucker
+ * Plugin Name: Globie Video Sucker
  * Plugin URI:
- * Description: Pull data directly from Vimeo and insert it on your post.
+ * Description: Pull data directly from Video and insert it on your post.
  * Version: 1.0.0
  * Author: Interglobal Vision
  * Author URI: http://interglobal.vision
  * License: GPL2
 */
+require 'vendor/autoload.php';
 
-class Globie_Vimeo_Sucker {
+class Globie_Video_Sucker {
+
   public function __construct() {
     register_activation_hook( __FILE__, array( $this, 'after_activation' ) );
     add_action('admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-    add_action( 'add_meta_boxes', array( $this, 'add_vimeo_field' ) );
-    add_action( 'save_post', array( $this, 'save_vimeo_id' ) );
+    add_action( 'add_meta_boxes', array( $this, 'add_video_field' ) );
+    add_action( 'save_post', array( $this, 'save_video_id' ) );
     add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
     add_action( 'admin_init', array( $this, 'settings_init' ) );
   }
 
   public function after_activation() {
-    
+
     // Check if previous settins aren't stored
     if( !get_option( 'gvsucker_settings_post_types' ) ) {
-      // Enable Vimeo field on "posts" post type
+      // Enable Video field on "posts" post type
       update_option( 'gvsucker_settings_post_types', array(
         0 => 'post'
       ) );
     }
+
     //delete_option( 'gvsucker_settings_post_types' );
     //delete_option( 'gvsucker_settings_whitelist' );
   }
 
-  /** 
+  /**
    * Load JS scripts
    * Only on post.php and post-new.php
    */
@@ -45,65 +48,67 @@ class Globie_Vimeo_Sucker {
     $saved_post_types = get_option( 'gvsucker_settings_post_types' );
 
     if( in_array( $post_type, $saved_post_types ) ) {
-      wp_register_script( 'globie-vimeo-sucker-script', plugins_url( '/globie-vimeo-sucker.js', __FILE__ ), array( 'jquery' ) );
+      wp_register_script( 'globie-video-sucker-get-video-id', plugins_url( '/globie-video-sucker.js', __FILE__ ), array( 'jquery' ) );
+      wp_register_script( 'globie-video-sucker-script', plugins_url( '/globie-video-sucker.js', __FILE__ ), array( 'jquery' ) );
     }
 
     // Get plugin options
     $whitelist = get_option( 'gvsucker_settings_whitelist' );
 
     // Pass options to js script
-    wp_localize_script( 'globie-vimeo-sucker-script', 'gVSucker', array( 
-      "whitelist" => $whitelist 
+    wp_localize_script( 'globie-video-sucker-script', 'GVS', array(
+      'whitelist' => $whitelist,
+      'apiUrl' => home_url() . '/wp-json/globie-video-sucker/v1/',
     ) );
 
     // Enqueue script
-    wp_enqueue_script( 'globie-vimeo-sucker-script' );
+    wp_enqueue_script( 'globie-video-sucker-script' );
   }
 
-  public function add_vimeo_field() {
+  public function add_video_field() {
     $saved_post_types = get_option( 'gvsucker_settings_post_types' );
 
     foreach( $saved_post_types as $post_type ) {
       add_meta_box(
-        'gvsucker-vimeo-id-meta-box',
-        'Vimeo ID',
-        array( $this, 'vimeo_id_meta_box_callback' ),
+        'gvsucker-video-id-meta-box',
+        'Video ID',
+        array( $this, 'video_id_meta_box_callback' ),
         $post_type
       );
     }
   }
 
   /**
-   * Prints the Vimeo ID box.
+   * Prints the Video ID box.
    *
    * @patam WP_Post $post The object for the current post.
    */
-  public function vimeo_id_meta_box_callback( $post ) {
+  public function video_id_meta_box_callback( $post ) {
 
     // Add an nonce field so we can check for it later.
-    wp_nonce_field( 'globie_vimeo_sucker', 'gvsucker_nonce' );
+    wp_nonce_field( 'globie_video_sucker', 'gvsucker_nonce' );
 
     /*
      * Use get_post_meta() to retrieve an existing value
      * from the database and use the value for the form.
      */
-    $vimeo_id_value = get_post_meta( $post->ID, '_vimeo_id_value', true );
-    $vimeo_width_value = get_post_meta( $post->ID, '_vimeo_width_value', true );
-    $vimeo_height_value = get_post_meta( $post->ID, '_vimeo_height_value', true );
-    $vimeo_ratio_value = get_post_meta( $post->ID, '_vimeo_ratio_value', true );
+    $video_id_value = get_post_meta( $post->ID, '_video_id_value', true );
+    $video_width_value = get_post_meta( $post->ID, '_video_width_value', true );
+    $video_height_value = get_post_meta( $post->ID, '_video_height_value', true );
+    $video_ratio_value = get_post_meta( $post->ID, '_video_ratio_value', true );
 
-    echo '<input type="text" id="gvsucker-id-field" name="gvsucker-id-field" value="' . esc_attr( $vimeo_id_value ) . '" size="25" />';
+    echo '<input type="text" id="gvsucker-id-field" name="gvsucker-id-field" value="' . esc_attr( $video_id_value ) . '" size="25" />';
     echo '<input type="hidden" id="gvsucker-img-field" name="gvsucker-img-field" value="" />';
 
-    echo '<input type="hidden" id="gvsucker-width-field" name="gvsucker-width-field" value="' . esc_attr( $vimeo_width_value ) . '" />';
-    echo '<input type="hidden" id="gvsucker-height-field" name="gvsucker-height-field" value="' . esc_attr( $vimeo_height_value ) . '" />';
-    echo '<input type="hidden" id="gvsucker-ratio-field" name="gvsucker-ratio-field" value="' . esc_attr( $vimeo_ratio_value ) . '" />';
+    echo '<input type="hidden" id="gvsucker-width-field" name="gvsucker-width-field" value="' . esc_attr( $video_width_value ) . '" />';
+    echo '<input type="hidden" id="gvsucker-height-field" name="gvsucker-height-field" value="' . esc_attr( $video_height_value ) . '" />';
+    echo '<input type="hidden" id="gvsucker-ratio-field" name="gvsucker-ratio-field" value="' . esc_attr( $video_ratio_value ) . '" />';
 
-    echo ' <input type="submit" id="suck-vimeo-data" value="Suck it!" class="button">';
+    echo ' <input type="submit" id="suck-video-data" value="Suck it!" class="button">';
     echo ' <div id="globie-spinner" style="background: url(\'/wp-admin/images/wpspin_light.gif\') no-repeat; background-size: 16px 16px; display: none; opacity: .7; filter: alpha(opacity=70); width: 16px; height: 16px; margin: 0 10px;"></div>';
   }
 
-  public function save_vimeo_id( $post_id ) {
+  public function save_video_id( $post_id ) {
 
     // Check nonce
     if ( ! isset( $_POST['gvsucker_nonce'] ) ) {
@@ -111,7 +116,7 @@ class Globie_Vimeo_Sucker {
     }
 
     // Verify nonce
-    if ( ! wp_verify_nonce( $_POST['gvsucker_nonce'], 'globie_vimeo_sucker' ) ) {
+    if ( ! wp_verify_nonce( $_POST['gvsucker_nonce'], 'globie_video_sucker' ) ) {
       return;
     }
 
@@ -127,26 +132,26 @@ class Globie_Vimeo_Sucker {
 
     // OK, it's safe for us to save the data now.
 
-    // Make sure that vimeo ID is set.
+    // Make sure that video ID is set.
     if ( ! isset( $_POST['gvsucker-id-field'] ) ) {
       return;
     }
 
-    // Sanitize vimeo ID input
-    $vimeo_id = sanitize_text_field( $_POST['gvsucker-id-field'] );
+    // Sanitize video ID input
+    $video_id = sanitize_text_field( $_POST['gvsucker-id-field'] );
 
-    // Update the vimeo ID field in the database.
-    update_post_meta( $post_id, '_vimeo_id_value', $vimeo_id );
+    // Update the video ID field in the database.
+    update_post_meta( $post_id, '_video_id_value', $video_id );
 
     // Sanitize video values
-    $vimeo_width = sanitize_text_field( $_POST['gvsucker-width-field'] );
-    $vimeo_height = sanitize_text_field( $_POST['gvsucker-height-field'] );
-    $vimeo_ratio = sanitize_text_field( $_POST['gvsucker-ratio-field'] );
+    $video_width = sanitize_text_field( $_POST['gvsucker-width-field'] );
+    $video_height = sanitize_text_field( $_POST['gvsucker-height-field'] );
+    $video_ratio = sanitize_text_field( $_POST['gvsucker-ratio-field'] );
 
     // Update meta values
-    update_post_meta( $post_id, '_vimeo_width_value', $vimeo_width );
-    update_post_meta( $post_id, '_vimeo_height_value', $vimeo_height );
-    update_post_meta( $post_id, '_vimeo_ratio_value', $vimeo_ratio );
+    update_post_meta( $post_id, '_video_width_value', $video_width );
+    update_post_meta( $post_id, '_video_height_value', $video_height );
+    update_post_meta( $post_id, '_video_ratio_value', $video_ratio );
 
     // Make sure that thumb url is set.
     if ( ! isset( $_POST['gvsucker-img-field'] ) ) {
@@ -154,12 +159,12 @@ class Globie_Vimeo_Sucker {
     }
 
     // Sanitize user input
-    $vimeo_img = sanitize_text_field( $_POST['gvsucker-img-field'] );
+    $video_img = sanitize_text_field( $_POST['gvsucker-img-field'] );
     $upload_dir = wp_upload_dir();
 
     //Get the remote image and save to uploads directory
-    $img_name = time().'_'.basename( $vimeo_img );
-    $img = wp_remote_get( $vimeo_img );
+    $img_name = time().'_'.basename( $video_img );
+    $img = wp_remote_get( $video_img );
     if ( is_wp_error( $img ) ) {
       $error_message = $img->get_error_message();
       add_action( 'admin_notices', array( $this, 'wprthumb_admin_notice' ) );
@@ -190,16 +195,36 @@ class Globie_Vimeo_Sucker {
 
   public function add_admin_menu() {
     add_options_page(
-      'Globie Vimeo Sucker Options',
-      'Globie Vimeo Sucker',
+      'Globie Video Sucker Options',
+      'Globie Video Sucker',
       'manage_options',
-      'globie_vimeo_sucker',
+      'globie_video_sucker',
       array( $this, 'options_page' )
     );
   }
 
   // Register settings, sections and fields
   public function settings_init() {
+    // Register option: youtube_key
+    register_setting( 'gvsucker_options_page', 'gvsucker_settings_youtube_key' );
+
+    // Add youtube_key section
+    add_settings_section(
+      'gvsucker_youtube_key_section',
+      __( 'Youtube API key', 'wordpress' ),
+      array( $this, 'settings_youtube_key_section_callback' ),
+      'gvsucker_options_page'
+    );
+
+    // youtube_key field
+    add_settings_field(
+      'gvsucker_youtube_key_fields',
+      __( 'Youtube ID', 'wordpress' ),
+      array( $this, 'settings_youtube_key_field_render' ),
+      'gvsucker_options_page',
+      'gvsucker_youtube_key_section'
+    );
+
     // Register option: post types
     register_setting( 'gvsucker_options_page', 'gvsucker_settings_post_types' );
 
@@ -241,6 +266,20 @@ class Globie_Vimeo_Sucker {
     );
   }
 
+  public function settings_youtube_key_section_callback() {
+    echo __( '', 'wordpress' );
+  }
+
+  public function settings_youtube_key_field_render() {
+    // Get options saved
+    $youtube_key = get_option( 'gvsucker_settings_youtube_key' );
+
+    // Render fields
+    echo "<fieldset>";
+    echo '<label for="gvsucker_input_youtube_key" style="width: 100%;"><input type="text" style="width: 100%;" name="gvsucker_settings_youtube_key" id="gvsucker_input_youtube_key" value="' . $youtube_key  . '"></label><br />';
+    echo "</fieldset>";
+  }
+
   public function settings_post_types_fields_render() {
     // Get options saved
     $saved_post_types = get_option( 'gvsucker_settings_post_types' );
@@ -267,7 +306,7 @@ class Globie_Vimeo_Sucker {
   }
 
   public function settings_section_callback() {
-    echo __( 'Select the post types where you want to enable the Vimeo ID field', 'wordpress' );
+    echo __( 'Select the post types where you want to enable the Video ID field', 'wordpress' );
   }
 
   public function settings_whitelist_field_render() {
@@ -287,7 +326,7 @@ class Globie_Vimeo_Sucker {
 
   public function options_page() {
     echo '<form action="options.php" method="post">';
-    echo '<h2>Globie Vimeo Sucker Options</h2>';
+    echo '<h2>Globie Video Sucker Options</h2>';
 
     settings_fields( 'gvsucker_options_page' );
     do_settings_sections( 'gvsucker_options_page' );
@@ -297,10 +336,31 @@ class Globie_Vimeo_Sucker {
 
   }
 }
-$gVSucker = new Globie_Vimeo_Sucker();
+$GVS = new Globie_Video_Sucker();
 
-function pr( $var ) {
-  echo '<pre>';
-  print_r( $var );
-  echo '</pre>';
+add_action( 'rest_api_init', 'dt_register_api_hooks' );
+function dt_register_api_hooks() {
+  // Add deep-thoughts/v1/get-all-post-ids route
+  register_rest_route( 'globie-video-sucker/v1', '/video/(?P<id>[a-zA-Z0-9-]+)', array(
+    'methods' => 'GET',
+    'callback' => 'get_video_data',
+  ) );
+}
+
+function get_video_data($data) {
+
+  $id = $data['id'];
+  // TODO: validate either id or url
+
+  // Get youtube id from options
+  $youtube_key = get_option( 'gvsucker_settings_youtube_key' );
+
+  // Init youtube with Key
+  $youtube = new Madcoda\Youtube\Youtube(array('key' =>  $youtube_key));
+
+  // Get video info
+  $video = $youtube->getVideoInfo($id);
+
+  return $video;
+
 }
