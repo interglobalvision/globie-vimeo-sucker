@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
-  console.log('Globie vimeo sucker');
-  var suckDataButton = document.getElementById('suck-vimeo-data');
+  console.log('Globie video sucker');
+  var suckDataButton = document.getElementById('suck-video-data');
   suckDataButton.addEventListener("click", function(e) {
     e.preventDefault();
 
-    vimeoId = document.getElementById('gvsucker-id-field');
-    if( vimeoId.value == '' ) {
+    videoId = document.getElementById('gvsucker-id-field');
+    if( videoId.value == '' ) {
       alert(' ID needed');
       return;
     }
@@ -23,27 +23,27 @@ document.addEventListener("DOMContentLoaded", function() {
     } else {
       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
     }
-    xmlhttp.open('GET', GVS.apiUrl + 'video/' + vimeoId.value, true);
+    xmlhttp.open('GET', GVS.apiUrl + 'video/' + videoId.value, true);
 
     xmlhttp.onreadystatechange = function() {
       if( xmlhttp.readyState == 4 ) {
         if( xmlhttp.status == 200 ) {
-          var vimeoData = JSON.parse(xmlhttp.responseText);
+          var videoData = JSON.parse(xmlhttp.responseText);
 
           // Set title
           document.getElementById('title').focus();
-          document.getElementById('title').value = vimeoData.snippet.title;
+          document.getElementById('title').value = videoData.snippet.title;
 
           // Set content
           // For Visual editor
           if( document.getElementById('content-tmce') ) {
             window.switchEditors.go('content', 'html');
-            document.getElementById('content').value = vimeoData.snippet.description;
+            document.getElementById('content').value = videoData.snippet.description;
             window.switchEditors.go('content', 'tmce');
 
           // For Text editor
           } else {
-            document.querySelector('.wp-editor-area').value = vimeoData.snippet.description;
+            document.querySelector('.wp-editor-area').value = videoData.snippet.description;
           }
 
           /*
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function() {
           inside.innerHTML = '';
 
           //    Set Thumbnail
-          var maxResThumbnail = vimeoData.snippet.thumbnails.standard;
+          var maxResThumbnail = videoData.snippet.thumbnails.standard;
 
           var featImg = document.createElement('img');
           featImg.setAttribute('id', 'gvsucker-img');
@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function() {
           featImg.setAttribute('width', 266);
           inside.appendChild(featImg);
 
-          vimeoThumb = vimeoData.snippet.thumbnails.maxres.url;
+          videoThumb = videoData.snippet.thumbnails.maxres.url;
 
           // Set video values
           document.getElementById('gvsucker-width-field').value = maxResThumbnail.width;
@@ -81,8 +81,8 @@ document.addEventListener("DOMContentLoaded", function() {
           document.getElementById('gvsucker-ratio-field').value = (maxResThumbnail.height/maxResThumbnail.width);
 
           // Remove any POST params in the image url
-          vimeoThumb = vimeoThumb.split('?')[0];
-          document.getElementById('gvsucker-img-field').value = vimeoThumb;
+          videoThumb = videoThumb.split('?')[0];
+          document.getElementById('gvsucker-img-field').value = videoThumb;
         }
       } else {
         if( xmlhttp.responseText ) {
