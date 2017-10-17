@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function() {
           featImg.setAttribute('width', 266);
           inside.appendChild(featImg);
 
-          videoThumb = videoData.snippet.thumbnails.maxres.url;
+          videoThumb = typeof videoData.snippet.thumbnails.maxres === 'undefined' ? videoData.snippet.thumbnails.standard.url :  videoData.snippet.thumbnails.maxres.url;
 
           // Set video values
           document.getElementById('gvsucker-width-field').value = maxResThumbnail.width;
