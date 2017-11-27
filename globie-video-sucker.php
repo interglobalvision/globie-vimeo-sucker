@@ -341,7 +341,7 @@ $GVS = new Globie_Video_Sucker();
 add_action( 'rest_api_init', 'dt_register_api_hooks' );
 function dt_register_api_hooks() {
   // Add deep-thoughts/v1/get-all-post-ids route
-  register_rest_route( 'globie-video-sucker/v1', '/video/(?P<id>[a-zA-Z0-9-]+)', array(
+  register_rest_route( 'globie-video-sucker/v1', '/video/(?P<id>[a-zA-Z0-9\-\_]+)', array(
     'methods' => 'GET',
     'callback' => 'get_video_data',
   ) );
